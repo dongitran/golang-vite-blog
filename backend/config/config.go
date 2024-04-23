@@ -24,11 +24,6 @@ func LoadEnvVariables() {
 	Username = os.Getenv("MONGODB_USERNAME")
 	Password = os.Getenv("MONGODB_PASSWORD")
 
-	// Get env of kafka
-	KafkaBrokers = os.Getenv("KAFKA_BROKERS")
-	KafkaTopic = "DATABASE_CHANGE_TOPIC"
-	KafkaTopicValidateData = "VALIDATE_DATA_TOPIC"
-
 	// Get env of postgres
 	PostgresDBHost = os.Getenv("POSTGRES_DB_HOST")
 	PostgresDBPort = os.Getenv("POSTGRES_DB_PORT")
@@ -62,8 +57,8 @@ func loadConfigMapEnvVariables() {
 		log.Fatal("Error creating Kubernetes client: ", err)
 	}
 
-	configMapName := "database-change-monitoring-env"
-	namespace := "database-change-monitoring"
+	configMapName := "golang-reactjs-remix-blog-env"
+	namespace := "golang-reactjs-remix-blog"
 
 	configMap, err := clientset.CoreV1().ConfigMaps(namespace).Get(context.TODO(), configMapName, v1.GetOptions{})
 	if err != nil {
@@ -77,11 +72,6 @@ func loadConfigMapEnvVariables() {
 	Collection = configMap.Data["MONGODB_COLLECTION"]
 	Username = configMap.Data["MONGODB_USERNAME"]
 	Password = configMap.Data["MONGODB_PASSWORD"]
-
-	// Get env of kafka
-	KafkaBrokers = configMap.Data["KAFKA_BROKERS"]
-	KafkaTopic = "DATABASE_CHANGE_TOPIC"
-	KafkaTopicValidateData = "VALIDATE_DATA_TOPIC"
 
 	// Get env of postgres
 	PostgresDBHost = configMap.Data["POSTGRES_DB_HOST"]
@@ -98,6 +88,4 @@ func logEnvVariables() {
 	log.Println("MONGODB_COLLECTION:", Collection)
 	log.Println("MONGODB_USERNAME:", Username)
 	log.Println("MONGODB_PASSWORD:", Password)
-	log.Println("KAFKA_BROKERS:", KafkaBrokers)
-	log.Println("KafkaTopic:", KafkaTopic)
 }

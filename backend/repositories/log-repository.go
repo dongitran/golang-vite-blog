@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/dongitran/database-change-monitoring/config"
-	"github.com/dongitran/database-change-monitoring/models"
+	"github.com/dongitran/golang-reactjs-remix-blog/config"
+	"github.com/dongitran/golang-reactjs-remix-blog/models"
 )
 
 func InsertLog(log models.Log) error {

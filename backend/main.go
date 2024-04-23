@@ -3,9 +3,12 @@ package main
 import (
 	"context"
 	"log"
+	"net/http"
 
-	"github.com/dongitran/database-change-monitoring/config"
-	"github.com/dongitran/database-change-monitoring/kafka"
+	"github.com/gin-gonic/gin"
+
+	"github.com/dongitran/golang-reactjs-remix-blog/config"
+	"github.com/dongitran/golang-reactjs-remix-blog/repositories"
 )
 
 func main() {
@@ -30,5 +33,21 @@ func main() {
 	}
 	defer db.Close()
 
-	kafka.StartKafkaConsumer()
+	router := gin.Default()
+
+	// Định nghĩa handler cho đường dẫn /api/hello
+	router.GET("/api/hello", func(c *gin.Context) {
+		repository := repositories.NewContentRepository(db)
+		datas, _ := repository.GetAll()
+		log.Println("Data from postgres: ")
+		//log.Println(data)
+		for _, v := range datas {
+			log.Printf("Data ID: %d, Title: %s, Content: %s", v.ID, v.Title, v.Content)
+		}
+		// Trả về một thông điệp "Hello, world!"
+		c.JSON(http.StatusOK, gin.H{"message": "Hello, world!"})
+	})
+
+	// Chạy server trên cổng 8080
+	router.Run(":8080")
 }
