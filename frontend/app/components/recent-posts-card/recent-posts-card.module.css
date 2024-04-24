@@ -29,7 +29,6 @@
 
 .tagCard {
   position: relative;
-  cursor: pointer;
   overflow: hidden;
   transition:
     transform 150ms ease,

@@ -4,7 +4,9 @@ import (
 	"context"
 	"log"
 	"net/http"
+	"strconv"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 
 	"github.com/dongitran/golang-reactjs-remix-blog/config"
@@ -35,19 +37,36 @@ func main() {
 
 	router := gin.Default()
 
-	// Định nghĩa handler cho đường dẫn /api/hello
-	router.GET("/api/hello", func(c *gin.Context) {
+	router.Use(cors.Default())
+
+	router.GET("/api/recent-posts", func(c *gin.Context) {
 		repository := repositories.NewContentRepository(db)
 		datas, _ := repository.GetAll()
-		log.Println("Data from postgres: ")
-		//log.Println(data)
+
+		var contentData []gin.H
 		for _, v := range datas {
-			log.Printf("Data ID: %d, Title: %s, Content: %s", v.ID, v.Title, v.Content)
+			contentData = append(contentData, gin.H{
+				"id":           v.ID,
+				"title":        v.Title,
+				"banner_image": v.BannerImage,
+			})
 		}
-		// Trả về một thông điệp "Hello, world!"
-		c.JSON(http.StatusOK, gin.H{"message": "Hello, world!"})
+		c.JSON(http.StatusOK, gin.H{"content": contentData})
 	})
 
-	// Chạy server trên cổng 8080
-	router.Run(":8080")
+	router.GET("/api/post/:id", func(c *gin.Context) {
+		id := c.Param("id")
+
+		repository := repositories.NewContentRepository(db)
+		idInt, _ := strconv.Atoi(id)
+		data, err := repository.FindByID(idInt)
+		if err != nil {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Data not found"})
+			return
+		}
+
+		c.JSON(http.StatusOK, data)
+	})
+
+	router.Run(":4000")
 }
