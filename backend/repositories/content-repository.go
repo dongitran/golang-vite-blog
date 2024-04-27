@@ -35,9 +35,24 @@ func (r *ContentRepository) Delete(id int) error {
 	return err
 }
 
-func (r *ContentRepository) GetAll() ([]*models.Content, error) {
+func (r *ContentRepository) GetLimitedSortedRecords(limit int, tag string) ([]*models.Content, error) {
 	var Contents []*models.Content
-	err := r.DB.Model(&Contents).Select()
-	return Contents, err
-}
 
+	if tag == "" || tag == "all" {
+		err := r.DB.Model(&Contents).Order("created_at DESC").Limit(limit).Select()
+		return Contents, err
+	}
+
+	err := r.DB.Model(&Contents).
+		Where("(params->>'tags')::jsonb @> '[ \"" + tag + "\" ]'::jsonb").
+		Order("created_at DESC").
+		Limit(limit).
+		Select()
+
+	if err != nil {
+		return nil, err
+	}
+
+	return Contents, nil
+
+}

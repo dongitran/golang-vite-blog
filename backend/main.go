@@ -40,8 +40,9 @@ func main() {
 	router.Use(cors.Default())
 
 	router.GET("/api/recent-posts", func(c *gin.Context) {
+		tag := c.Query("tag")
 		repository := repositories.NewContentRepository(db)
-		datas, _ := repository.GetAll()
+		datas, _ := repository.GetLimitedSortedRecords(5, tag)
 
 		var contentData []gin.H
 		for _, v := range datas {
