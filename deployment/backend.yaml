@@ -22,4 +22,20 @@ spec:
             - containerPort: 8080
           envFrom:
             - configMapRef:
-                name: golang-vite-blog-env
+                name: golang-vite-blog-backend-env
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: golang-vite-blog-backend-service
+  namespace: golang-vite-blog
+spec:
+  selector:
+    app: golang-vite-blog-backend
+  type: NodePort
+  ports:
+    - protocol: TCP
+      port: 4000
+      targetPort: 4000
+      nodePort: 30150
