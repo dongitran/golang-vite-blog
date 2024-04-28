@@ -1,7 +1,7 @@
 go build -o main .
 
-kubectl create configmap database-change-monitoring-env --from-env-file=.env --namespace=database-change-monitoring
-kubectl delete configmap -n=database-change-monitoring database-change-monitoring-env
+kubectl create configmap golang-vite-blog-backend-env --from-env-file=.env --namespace=golang-vite-blog
+kubectl delete configmap -n=golang-vite-blog golang-vite-blog-backend-env
 
-docker build -t database-change-monitoring .
-docker run -v .env:/app/.env database-change-monitoring
+docker build -t golang-vite-blog-backend .
+docker run -v .env:/app/.env golang-vite-blog-backend

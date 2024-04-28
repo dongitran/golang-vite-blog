@@ -1,5 +1,4 @@
 import { Paper, Text } from "@mantine/core";
-import { IconFlame } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { RecentPost } from "../recent-post/recent-post";
 import { Tag } from "../tag/tag";

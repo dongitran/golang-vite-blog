@@ -3,7 +3,7 @@ name: Deploy to Docker Hub
 on:
   push:
     branches:
-      - preprocess-node
+      - backend
 
 jobs:
   send-notification-started:
@@ -17,7 +17,7 @@ jobs:
           format: markdown
           disable_web_page_preview: true
           message: |
-            *🚀 Database Change Monitoring - Preprocess node* 🏃‍♂️${{ github.run_number }}
+            *🚀 Golang Vite Blog - BackEnd* 🏃‍♂️${{ github.run_number }}
 
             *👤 Committer:* [${{ github.actor }}](https://github.com/${{ github.actor }})
             *📝 Commit message:* ${{ github.event.commits[0].message }}
@@ -44,10 +44,10 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
-          context: .
-          file: ./Dockerfile
+          context: ./backend
+          file: ./backend/Dockerfile
           push: true
-          tags: ideavn/database-change-monitoring:${{ github.run_number }}
+          tags: ideavn/golang-vite-blog-backend:${{ github.run_number }}
 
   deploy:
     needs: build
@@ -79,8 +79,9 @@ jobs:
           K8S_ID: ${{ secrets.K8S_ID }}
         run: |
           doctl kubernetes cluster kubeconfig save ${K8S_ID}
-          sed -i 's/{latest}/${{ github.run_number }}/g' ./deployment/preprocess-node.yaml
-          kubectl apply -f ./deployment/preprocess-node.yaml --validate=false
+          sed -i 's/{latest}/${{ github.run_number }}/g' ./deployment/backend.yaml
+          kubectl apply -f ./deployment/namespace.yaml --validate=false
+          kubectl apply -f ./deployment/backend.yaml --validate=false
 
   send-notification-build-failed:
     needs: build
@@ -95,12 +96,14 @@ jobs:
           format: markdown
           disable_web_page_preview: true
           message: |
-            *❌ Database Change Monitoring - Preprocess node Build Failed*  
+            *❌ Golang Vite Blog - BackEnd*  
             
             *👤 Committer:* [${{ github.actor }}](https://github.com/${{ github.actor }})
             *📝 Commit message:* ${{ github.event.commits[0].message }}
             *📦 Repository:* ${{ github.repository }}
             *🔍 See changes:* [View changes](https://github.com/${{ github.repository }}/commit/${{github.sha}})
+
+            Build Failed
             😐️️️️️️😐️️️️️️😐️️️️️️😐️️️️️️😐️️️️️️😐️️️️️️
 
   send-notification-successful:
@@ -116,12 +119,14 @@ jobs:
           format: markdown
           disable_web_page_preview: true
           message: |
-            *🎉 Database Change Monitoring - Preprocess node Deployment Successful*  
+            *🎉 Golang Vite Blog - BackEnd*  
             
             *👤 Committer:* [${{ github.actor }}](https://github.com/${{ github.actor }})
             *📝 Commit message:* ${{ github.event.commits[0].message }}
             *📦 Repository:* ${{ github.repository }}
             *🔍 See changes:* [View changes](https://github.com/${{ github.repository }}/commit/${{github.sha}})
+
+            Deployment Successful
             🚀️️️️️️🚀️️️️️️🚀️️️️️️🚀️️️️️️🚀️️️️️️🚀️️️️️️
 
   send-notification-deploy-failed:
@@ -137,10 +142,12 @@ jobs:
           format: markdown
           disable_web_page_preview: true
           message: |
-            *❌ Database Change Monitoring - Preprocess node Deployment Failed*  
+            *❌ Golang Vite Blog - BackEnd*  
             
             *👤 Committer:* [${{ github.actor }}](https://github.com/${{ github.actor }})
             *📝 Commit message:* ${{ github.event.commits[0].message }}
             *📦 Repository:* ${{ github.repository }}
             *🔍 See changes:* [View changes](https://github.com/${{ github.repository }}/commit/${{github.sha}})
+
+            Deployment Failed
             😐️️️️️️😐️️️️️️😐️️️️️️😐️️️️️️😐️️️️️️😐️️️️️️

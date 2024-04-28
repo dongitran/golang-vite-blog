@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: golang-vite-blog-backend
+  namespace: golang-vite-blog
+  labels:
+    app: golang-vite-blog-backend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: golang-vite-blog-backend
+  template:
+    metadata:
+      labels:
+        app: golang-vite-blog-backend
+    spec:
+      containers:
+        - name: golang-vite-blog-backend
+          image: ideavn/golang-vite-blog-backend:{latest}
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: golang-vite-blog-env
