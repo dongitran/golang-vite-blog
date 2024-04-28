@@ -17,9 +17,9 @@ spec:
     spec:
       containers:
         - name: golang-vite-blog-frontend
-          image: ideavn/golang-vite-blog-frontend:{latest}
+          image: ideavn/golang-vite-blog-frontend:6
           ports:
-            - containerPort: 8080
+            - containerPort: 3000
 
 ---
 apiVersion: v1
