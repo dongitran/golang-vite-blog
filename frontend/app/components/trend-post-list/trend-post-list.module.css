@@ -28,6 +28,11 @@
   line-height: 1.2;
   font-weight: 700;
   margin-bottom: rem(8px);
+  justify-items: center;
+  align-content: center;
+  align-items: center;
+  align-self: center;
+  justify-content: center;
 
   @media (max-width: $mantine-breakpoint-md) {
     font-size: rem(28px);

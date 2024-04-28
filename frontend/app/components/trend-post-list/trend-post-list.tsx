@@ -1,4 +1,4 @@
-import { Paper, Title } from "@mantine/core";
+import { Paper, Title, Text } from "@mantine/core";
 import { IconFlame } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import classes from "./trend-post-list.module.css";
@@ -40,10 +40,20 @@ export function TrendPostList() {
         style={{
           display: "flex",
           alignItems: "center",
+          marginBottom: "0.5rem",
         }}
       >
         <IconFlame />
-        <Title className={classes.title}>Trending</Title>
+
+        <div
+          style={{
+            display: "flex",
+          }}
+        >
+          <Text style={{ fontSize: "1.5rem", fontWeight: "bold" }}>
+            Trending
+          </Text>
+        </div>
       </div>
 
       {data &&

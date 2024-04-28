@@ -61,8 +61,9 @@ export function RecentPostsCard() {
             display: "flex",
           }}
         >
-          <IconFlame />
-          <Text>Recent Posts</Text>
+          <Text style={{ fontSize: "1.5rem", fontWeight: "bold" }}>
+            Recent Posts
+          </Text>
         </div>
         <Tag
           setValue={(value) => {
