@@ -20,9 +20,6 @@ spec:
           image: ideavn/golang-vite-blog-frontend:{latest}
           ports:
             - containerPort: 8080
-          envFrom:
-            - configMapRef:
-                name: golang-vite-blog-frontend-env
 
 ---
 apiVersion: v1
