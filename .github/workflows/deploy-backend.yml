@@ -81,6 +81,7 @@ jobs:
           doctl kubernetes cluster kubeconfig save ${K8S_ID}
           sed -i 's/{latest}/${{ github.run_number }}/g' ./deployment/backend.yaml
           kubectl apply -f ./deployment/namespace.yaml --validate=false
+          kubectl apply -f ./deployment/role.yaml --validate=false
           kubectl apply -f ./deployment/backend.yaml --validate=false
 
   send-notification-build-failed:
