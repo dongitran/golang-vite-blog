@@ -2,13 +2,9 @@ FROM node:21.7.1
 
 WORKDIR /app
 
-COPY package.json yarn.lock ./
-
-RUN yarn install
-
 COPY . .
 
-RUN ls
+RUN yarn install
 
 RUN yarn build
 
