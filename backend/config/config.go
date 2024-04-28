@@ -57,7 +57,7 @@ func loadConfigMapEnvVariables() {
 		log.Fatal("Error creating Kubernetes client: ", err)
 	}
 
-	configMapName := "golang-vite-blog-env"
+	configMapName := "golang-vite-blog-backend-env"
 	namespace := "golang-vite-blog"
 
 	configMap, err := clientset.CoreV1().ConfigMaps(namespace).Get(context.TODO(), configMapName, v1.GetOptions{})
