@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: golang-vite-blog-frontend
+  namespace: golang-vite-blog
+  labels:
+    app: golang-vite-blog-frontend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: golang-vite-blog-frontend
+  template:
+    metadata:
+      labels:
+        app: golang-vite-blog-frontend
+    spec:
+      containers:
+        - name: golang-vite-blog-frontend
+          image: ideavn/golang-vite-blog-frontend:{latest}
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: golang-vite-blog-frontend-env
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: golang-vite-blog-frontend-service
+  namespace: golang-vite-blog
+spec:
+  selector:
+    app: golang-vite-blog-frontend
+  type: NodePort
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000
+      nodePort: 30151
