@@ -57,6 +57,6 @@ spec:
         path: "/"
         backend:
           service:
-            name: tea-svc
+            name: golang-vite-blog-frontend-service
             port:
               number: 3000
