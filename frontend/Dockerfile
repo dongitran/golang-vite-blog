@@ -1,6 +1,6 @@
 FROM node:21.7.1
 
-WORKDIR /usr/src/app
+WORKDIR /app
 
 COPY package.json yarn.lock ./
 
