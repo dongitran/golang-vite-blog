@@ -39,3 +39,24 @@ spec:
       port: 3000
       targetPort: 3000
       nodePort: 30151
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: golang-vite-blog-ingress
+  namespace: golang-vite-blog
+  annotations:
+    kubernetes.io/ingress.class: nginx
+spec:
+  rules:
+  - host: dongtran.sequential-ci.xyz
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: tea-svc
+            port:
+              number: 3000
