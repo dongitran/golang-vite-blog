@@ -4593,6 +4593,7 @@ __metadata:
     react-markdown: "npm:^9.0.1"
     typescript: "npm:^5.4.2"
     vite: "npm:^5.1.6"
+    vite-plugin-radar: "npm:^0.9.4"
     vite-tsconfig-paths: "npm:^4.3.1"
   languageName: unknown
   linkType: soft
@@ -11347,6 +11348,15 @@ __metadata:
   bin:
     vite-node: vite-node.mjs
   checksum: 10c0/85f9e8616f3612c71193a2bbdfb00f610685108a65eaa7ac535655ca1bd65dda5436ee577465436f715966f34e4b25b54140bbd584fe2c95ea0726acf4ecd351
+  languageName: node
+  linkType: hard
+
+"vite-plugin-radar@npm:^0.9.4":
+  version: 0.9.4
+  resolution: "vite-plugin-radar@npm:0.9.4"
+  peerDependencies:
+    vite: ^2.0.0 || ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0
+  checksum: 10c0/566adea3d45254dcc57e4f7fe38b26a12588e32c73460950dc56a7589ea512124bd50ae3aa2a0085f1b8270d476ae587cfbcefddb35e9f4635bafa3667de5c73
   languageName: node
   linkType: hard
 
