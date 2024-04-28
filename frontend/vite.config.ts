@@ -13,22 +13,9 @@ export default defineConfig({
     remix(),
     tsconfigPaths(),
     VitePluginRadar({
-      /**
-       * enable or disable scripts injection in development
-       * default: false
-       */
-      enableDev: true,
-
-      // Google Analytics (multiple tag can be set with an array)
-      analytics: [
-        {
-          id: "G-GPVG26MR6B",
-        },
-        // You can add as many measurement id as you need
-        {
-          id: "UA-YYYYY",
-        },
-      ],
-    }),
+      analytics: {
+        id: 'G-GPVG26MR6B',
+      },
+    })
   ],
 });
