@@ -22,4 +22,4 @@ spec:
             - containerPort: 8080
           envFrom:
             - configMapRef:
-                name: golang-vite-blog-env
+                name: golang-vite-blog-backend-env
