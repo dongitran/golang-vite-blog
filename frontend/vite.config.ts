@@ -6,7 +6,6 @@ import dotenv from "dotenv";
 import { VitePluginRadar } from "vite-plugin-radar";
 import ReactGA from 'react-ga';
 ReactGA.initialize('G-GPVG26MR6B');
-ReactGA.pageview(window.location.pathname + window.location.search);
 
 dotenv.config();
 installGlobals();
