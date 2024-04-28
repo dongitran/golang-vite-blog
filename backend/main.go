@@ -50,6 +50,7 @@ func main() {
 				"id":           v.ID,
 				"title":        v.Title,
 				"banner_image": v.BannerImage,
+				"params":       v.Params,
 			})
 		}
 		c.JSON(http.StatusOK, gin.H{"content": contentData})
@@ -67,6 +68,22 @@ func main() {
 		}
 
 		c.JSON(http.StatusOK, data)
+	})
+
+	router.GET("/api/trending-posts", func(c *gin.Context) {
+		tag := "trending"
+		repository := repositories.NewContentRepository(db)
+		datas, _ := repository.GetLimitedSortedRecords(5, tag)
+
+		var contentData []gin.H
+		for _, v := range datas {
+			contentData = append(contentData, gin.H{
+				"id":           v.ID,
+				"title":        v.Title,
+				"banner_image": v.BannerImage,
+			})
+		}
+		c.JSON(http.StatusOK, gin.H{"content": contentData})
 	})
 
 	router.Run(":4000")

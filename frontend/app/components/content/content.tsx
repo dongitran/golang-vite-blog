@@ -1,7 +1,7 @@
-import { Container, Title } from "@mantine/core";
+import { Container } from "@mantine/core";
 import classes from "./content.module.css";
-import { TrendArticle } from "../trend-article/trend-article";
 import { RecentPostsCard } from "../recent-posts-card/recent-posts-card";
+import { TrendPostList } from "../trend-post-list/trend-post-list";
 
 export function Content() {
   return (
@@ -11,9 +11,7 @@ export function Content() {
           <RecentPostsCard />
         </div>
         <div className={classes.content} style={{ flex: 2 }}>
-          <Title className={classes.title}>Trending</Title>
-          <TrendArticle />
-          <TrendArticle />
+          <TrendPostList />
         </div>
       </div>
     </Container>

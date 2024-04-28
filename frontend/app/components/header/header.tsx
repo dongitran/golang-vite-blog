@@ -94,7 +94,7 @@ export function HeaderMegaMenu() {
     <Box pb={10}>
       <header className={classes.header}>
         <Group justify="space-between" h="100%">
-          <>dongtran blog</>
+          <>dongtran</>
 
           <Group h="100%" gap={0} visibleFrom="sm">
             <a href="/" className={classes.link}>
@@ -151,7 +151,7 @@ export function HeaderMegaMenu() {
               </HoverCard.Dropdown>
             </HoverCard>
             <a href="#" className={classes.link}>
-              Learn
+              About
             </a>
             <a href="contact" className={classes.link}>
               Contact

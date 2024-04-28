@@ -10,6 +10,9 @@ interface Post {
   id: string;
   title: string;
   banner_image: string;
+  params: {
+    tags: string[];
+  };
 }
 
 interface ApiResponse {
@@ -29,7 +32,6 @@ export function RecentPostsCard() {
     )
       .then((response) => response.json())
       .then((data) => {
-        console.log(data, "data");
         setData(data);
       })
       .catch((error) => {
@@ -38,12 +40,10 @@ export function RecentPostsCard() {
   }, [selectedTag]);
 
   const handlePostClick = (id: string) => {
-    console.log("clicked");
     navigate(`/content/${id}`);
   };
 
   const selectPost = (tag: string) => {
-    console.log("selected", tag);
     setSelectedTag(tag);
   };
 
@@ -72,16 +72,25 @@ export function RecentPostsCard() {
       </div>
 
       {data &&
-        data?.content?.map(
-          (post: { id: string; title: string; banner_image: string }) => (
+        data?.content
+          ?.filter((item) => {
+            const tags = item?.params?.tags;
+            if (
+              selectedTag?.toLowerCase() === "all" &&
+              tags?.includes("trending")
+            ) {
+              return false;
+            }
+            return true;
+          })
+          ?.map((post: { id: string; title: string; banner_image: string }) => (
             <RecentPost
               key={post.id}
               title={post.title}
               bannerImage={post.banner_image}
               onClick={() => handlePostClick(post.id)}
             />
-          )
-        )}
+          ))}
     </Paper>
   );
 }
