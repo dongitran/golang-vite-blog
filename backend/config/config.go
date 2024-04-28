@@ -57,8 +57,8 @@ func loadConfigMapEnvVariables() {
 		log.Fatal("Error creating Kubernetes client: ", err)
 	}
 
-	configMapName := "golang-reactjs-remix-blog-env"
-	namespace := "golang-reactjs-remix-blog"
+	configMapName := "golang-vite-blog-env"
+	namespace := "golang-vite-blog"
 
 	configMap, err := clientset.CoreV1().ConfigMaps(namespace).Get(context.TODO(), configMapName, v1.GetOptions{})
 	if err != nil {
