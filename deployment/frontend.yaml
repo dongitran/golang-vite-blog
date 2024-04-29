@@ -1,62 +1,62 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: golang-vite-blog-backend
+  name: golang-vite-blog-frontend
   namespace: golang-vite-blog
   labels:
-    app: golang-vite-blog-backend
+    app: golang-vite-blog-frontend
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: golang-vite-blog-backend
+      app: golang-vite-blog-frontend
   template:
     metadata:
       labels:
-        app: golang-vite-blog-backend
+        app: golang-vite-blog-frontend
     spec:
       containers:
-        - name: golang-vite-blog-backend
-          image: ideavn/golang-vite-blog-backend:{latest}
+        - name: golang-vite-blog-frontend
+          image: ideavn/golang-vite-blog-frontend:{latest}
           ports:
-            - containerPort: 8080
+            - containerPort: 3000
           envFrom:
             - configMapRef:
-                name: golang-vite-blog-backend-env
+                name: golang-vite-blog-frontend-env
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: golang-vite-blog-backend-service
+  name: golang-vite-blog-frontend-service
   namespace: golang-vite-blog
 spec:
   selector:
-    app: golang-vite-blog-backend
+    app: golang-vite-blog-frontend
   type: NodePort
   ports:
     - protocol: TCP
-      port: 4000
-      targetPort: 4000
-      nodePort: 30150
+      port: 3000
+      targetPort: 3000
+      nodePort: 30151
 
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: golang-vite-blog-backend-ingress
+  name: golang-vite-blog-ingress
   namespace: golang-vite-blog
   annotations:
     kubernetes.io/ingress.class: nginx
 spec:
   rules:
-  - host: dongtran-backend.sequential-ci.xyz
+  - host: dongtran.sequential-ci.xyz
     http:
       paths:
       - pathType: Prefix
         path: "/"
         backend:
           service:
-            name: golang-vite-blog-backend-service
+            name: golang-vite-blog-frontend-service
             port:
-              number: 4000
+              number: 3000
