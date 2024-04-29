@@ -39,3 +39,24 @@ spec:
       port: 4000
       targetPort: 4000
       nodePort: 30150
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: golang-vite-blog-backend-ingress
+  namespace: golang-vite-blog
+  annotations:
+    kubernetes.io/ingress.class: nginx
+spec:
+  rules:
+  - host: dongtran-backend.sequential-ci.xyz
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: golang-vite-blog-backend-service
+            port:
+              number: 4000
