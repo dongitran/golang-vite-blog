@@ -20,13 +20,6 @@ spec:
           image: ideavn/golang-vite-blog-frontend:{latest}
           ports:
             - containerPort: 3000
-          resources:
-            limits:
-              cpu: 20m
-              memory: 32Mi
-            requests:
-              cpu: 10m
-              memory: 32Mi
 
 ---
 apiVersion: v1
