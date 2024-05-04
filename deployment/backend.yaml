@@ -1,11 +1,12 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: golang-vite-blog-backend
   namespace: golang-vite-blog
   labels:
     app: golang-vite-blog-backend
 spec:
+  serviceName: golang-vite-blog-backend
   replicas: 1
   selector:
     matchLabels:
