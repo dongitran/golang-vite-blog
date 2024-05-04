@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
         - name: golang-vite-blog-frontend
-          image: ideavn/golang-vite-blog-frontend:34
+          image: ideavn/golang-vite-blog-frontend:{latest}
           ports:
             - containerPort: 3000
           resources:
