@@ -1,12 +1,13 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: golang-vite-blog-frontend
   namespace: golang-vite-blog
   labels:
     app: golang-vite-blog-frontend
 spec:
-  replicas: 3
+  serviceName: golang-vite-blog-frontend
+  replicas: 1
   selector:
     matchLabels:
       app: golang-vite-blog-frontend
@@ -17,9 +18,16 @@ spec:
     spec:
       containers:
         - name: golang-vite-blog-frontend
-          image: ideavn/golang-vite-blog-frontend:{latest}
+          image: ideavn/golang-vite-blog-frontend:34
           ports:
             - containerPort: 3000
+          resources:
+            limits:
+              cpu: 400m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
 
 ---
 apiVersion: v1
