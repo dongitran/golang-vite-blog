@@ -23,6 +23,13 @@ spec:
           envFrom:
             - configMapRef:
                 name: golang-vite-blog-frontend-env
+          resources:
+            limits:
+              cpu: 80m
+              memory: 128Mi
+            requests:
+              cpu: 50m
+              memory: 64Mi
 
 ---
 apiVersion: v1

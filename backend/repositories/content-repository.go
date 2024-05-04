@@ -39,7 +39,11 @@ func (r *ContentRepository) GetLimitedSortedRecords(limit int, tag string) ([]*m
 	var Contents []*models.Content
 
 	if tag == "" || tag == "all" {
-		err := r.DB.Model(&Contents).Order("created_at DESC").Limit(limit).Select()
+		err := r.DB.Model(&Contents).
+			Where("not (params->>'tags')::jsonb @> '[ \"trending\" ]'::jsonb").
+			Order("created_at DESC").
+			Limit(limit).
+			Select()
 		return Contents, err
 	}
 
