@@ -20,9 +20,6 @@ spec:
           image: ideavn/golang-vite-blog-frontend:{latest}
           ports:
             - containerPort: 3000
-          envFrom:
-            - configMapRef:
-                name: golang-vite-blog-frontend-env
           resources:
             limits:
               cpu: 80m
