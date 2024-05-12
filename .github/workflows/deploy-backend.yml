@@ -82,6 +82,7 @@ jobs:
           sed -i 's/{latest}/${{ github.run_number }}/g' ./deployment/backend.yaml
           kubectl apply -f ./deployment/namespace.yaml --validate=false
           kubectl apply -f ./deployment/role.yaml --validate=false
+          kubectl apply -f ./deployment/service-account.yaml --validate=false
           kubectl apply -f ./deployment/backend.yaml --validate=false
 
   send-notification-build-failed:
