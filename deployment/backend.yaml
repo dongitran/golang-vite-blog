@@ -15,7 +15,19 @@ spec:
     metadata:
       labels:
         app: golang-vite-blog-backend
+      annotations:
+        vault.hashicorp.com/agent-inject: 'true'
+        vault.hashicorp.com/role: 'golang-vite-blog-dev'
+        vault.hashicorp.com/agent-pre-populate-only: 'true'
+        vault.hashicorp.com/agent-inject-secret-env-config: 'kv/golang-vite-blog-dev'
+        vault.hashicorp.com/agent-inject-template-env-config: |
+            {{ with secret "kv/golang-vite-blog-dev" -}}
+              {{- range $key, $value := .Data.data }}
+                export {{ $key }}="{{ $value }}"
+              {{- end }}
+            {{- end }}
     spec:
+      serviceAccountName: golang-vite-blog-dev-auth
       containers:
         - name: golang-vite-blog-backend
           image: ideavn/golang-vite-blog-backend:{latest}

@@ -4,4 +4,5 @@ COPY . .
 RUN rm -rf .env .github .git
 RUN go build -o main .
 
-CMD ["./main"]
+ENTRYPOINT ["/bin/bash", "-c"]
+CMD ["source /vault/secrets/env-config && ./main"]
