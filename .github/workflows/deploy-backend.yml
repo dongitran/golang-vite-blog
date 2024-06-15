@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - backend
+  workflow_dispatch:
 
 jobs:
   send-notification-started:
