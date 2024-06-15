@@ -1,9 +1,10 @@
-name: Deploy to Docker Hub
+name: Deploy Frontend
 
-on:
+on: 
   push:
     branches:
       - frontend
+  workflow_dispatch:
 
 jobs:
   send-notification-started:

@@ -1,9 +1,9 @@
-name: Deploy Backend
+name: Init Vault
 
 on:
   push:
     branches:
-      - backend
+      - init-vault-backend
   workflow_dispatch:
 
 jobs:
@@ -18,7 +18,7 @@ jobs:
           format: markdown
           disable_web_page_preview: true
           message: |
-            *🚀 Golang Vite Blog - BackEnd* 🏃‍♂️${{ github.run_number }}
+            *🚀 Golang Vite Blog - Init Vault*  🏃‍♂️${{ github.run_number }}
 
             *👤 Committer:* [${{ github.actor }}](https://github.com/${{ github.actor }})
             *📝 Commit message:* ${{ github.event.commits[0].message }}
@@ -27,32 +27,7 @@ jobs:
 
             Started 🚁️️️️️️🚁️️️️️️🚁️️️️️️🚁️️️️️️
 
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-  
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-  
-      - name: Login to Docker Hub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-  
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: ./backend
-          file: ./backend/Dockerfile
-          push: true
-          tags: ideavn/golang-vite-blog-backend:${{ github.run_number }}
-
   deploy:
-    needs: build
-    if: ${{ success() && needs.build.result == 'success' }}
     runs-on: ubuntu-latest
     env:
       DO_ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
@@ -78,18 +53,51 @@ jobs:
       - name: Apply Kubernetes deployment
         env:
           K8S_ID: ${{ secrets.K8S_ID }}
+          MONGODB_HOST: ${{ secrets.MONGODB_HOST }}
+          MONGODB_PORT: ${{ secrets.MONGODB_PORT }}
+          MONGODB_NAME: ${{ secrets.MONGODB_NAME }}
+          MONGODB_COLLECTION: ${{ secrets.MONGODB_COLLECTION }}
+          MONGODB_USERNAME: ${{ secrets.MONGODB_USERNAME }}
+          MONGODB_PASSWORD: ${{ secrets.MONGODB_PASSWORD }}
+          KAFKA_BROKERS: ${{ secrets.KAFKA_BROKERS }}
+          POSTGRES_DB_HOST: ${{ secrets.POSTGRES_DB_HOST }}
+          POSTGRES_DB_PORT: ${{ secrets.POSTGRES_DB_PORT }}
+          POSTGRES_DB_DATABASE: ${{ secrets.POSTGRES_DB_DATABASE }}
+          POSTGRES_DB_USER_NAME: ${{ secrets.POSTGRES_DB_USER_NAME }}
+          POSTGRES_DB_PASSWORD: ${{ secrets.POSTGRES_DB_PASSWORD }}
         run: |
           doctl kubernetes cluster kubeconfig save ${K8S_ID}
-          sed -i 's/{latest}/${{ github.run_number }}/g' ./deployment/backend.yaml
-          kubectl apply -f ./deployment/namespace.yaml --validate=false
-          kubectl apply -f ./deployment/role.yaml --validate=false
-          kubectl apply -f ./deployment/service-account.yaml --validate=false
-          kubectl apply -f ./deployment/backend.yaml --validate=false
+          kubectl exec -n vault -i vault-0 -- vault kv put \
+            kv/golang-vite-blog-dev \
+            MONGODB_HOST="${MONGODB_HOST}" \
+            MONGODB_PORT="${MONGODB_PORT}" \
+            MONGODB_NAME="${MONGODB_NAME}" \
+            MONGODB_COLLECTION="${MONGODB_COLLECTION}" \
+            MONGODB_USERNAME="${MONGODB_USERNAME}" \
+            MONGODB_PASSWORD="${MONGODB_PASSWORD}" \
+            KAFKA_BROKERS="${KAFKA_BROKERS}" \
+            POSTGRES_DB_HOST="${POSTGRES_DB_HOST}" \
+            POSTGRES_DB_PORT="${POSTGRES_DB_PORT}" \
+            POSTGRES_DB_DATABASE="${POSTGRES_DB_DATABASE}" \
+            POSTGRES_DB_USER_NAME="${POSTGRES_DB_USER_NAME}" \
+            POSTGRES_DB_PASSWORD="${POSTGRES_DB_PASSWORD}"
 
-  send-notification-build-failed:
-    needs: build
+          kubectl exec -n vault -i vault-0 -- vault policy write golang-vite-blog-svc-policy - <<EOH
+          path "kv/data/golang-vite-blog-dev" {
+            capabilities = ["read"]
+          }
+          EOH
+
+          kubectl exec -n vault -i vault-0 -- vault write auth/kubernetes/role/golang-vite-blog-dev \
+            bound_service_account_names=golang-vite-blog-dev-auth \
+            bound_service_account_namespaces=golang-vite-blog \
+            policies=golang-vite-blog-svc-policy \
+            ttl=72h
+
+  send-notification-deploy-failed:
+    needs: deploy
     runs-on: ubuntu-latest
-    if: ${{ failure() && needs.build.result == 'failure' }}
+    if: ${{ failure() && needs.deploy.result == 'failure' }}
     steps:
       - name: Send Telegram Notification
         uses: appleboy/telegram-action@master
@@ -99,14 +107,14 @@ jobs:
           format: markdown
           disable_web_page_preview: true
           message: |
-            *❌ Golang Vite Blog - BackEnd*  
+            *❌ Golang Vite Blog - Init Vault *  🏃‍♂️${{ github.run_number }}
             
             *👤 Committer:* [${{ github.actor }}](https://github.com/${{ github.actor }})
             *📝 Commit message:* ${{ github.event.commits[0].message }}
             *📦 Repository:* ${{ github.repository }}
             *🔍 See changes:* [View changes](https://github.com/${{ github.repository }}/commit/${{github.sha}})
 
-            Build Failed
+            Deploy Failed!!!
             😐️️️️️️😐️️️️️️😐️️️️️️😐️️️️️️😐️️️️️️😐️️️️️️
 
   send-notification-successful:
@@ -122,35 +130,12 @@ jobs:
           format: markdown
           disable_web_page_preview: true
           message: |
-            *🎉 Golang Vite Blog - BackEnd*  
+            *🎉 Golang Vite Blog - Init Vault *  🏃‍♂️${{ github.run_number }}
             
             *👤 Committer:* [${{ github.actor }}](https://github.com/${{ github.actor }})
             *📝 Commit message:* ${{ github.event.commits[0].message }}
             *📦 Repository:* ${{ github.repository }}
             *🔍 See changes:* [View changes](https://github.com/${{ github.repository }}/commit/${{github.sha}})
 
-            Deployment Successful
+            Successful
             🚀️️️️️️🚀️️️️️️🚀️️️️️️🚀️️️️️️🚀️️️️️️🚀️️️️️️
-
-  send-notification-deploy-failed:
-    needs: deploy
-    runs-on: ubuntu-latest
-    if: ${{ failure() && needs.deploy.result == 'failure' }}
-    steps:
-      - name: Send Telegram Notification
-        uses: appleboy/telegram-action@master
-        with:
-          to: ${{ secrets.TELEGRAM_GROUP_DEPLOYMENTS }}
-          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          format: markdown
-          disable_web_page_preview: true
-          message: |
-            *❌ Golang Vite Blog - BackEnd*  
-            
-            *👤 Committer:* [${{ github.actor }}](https://github.com/${{ github.actor }})
-            *📝 Commit message:* ${{ github.event.commits[0].message }}
-            *📦 Repository:* ${{ github.repository }}
-            *🔍 See changes:* [View changes](https://github.com/${{ github.repository }}/commit/${{github.sha}})
-
-            Deployment Failed
-            😐️️️️️️😐️️️️️️😐️️️️️️😐️️️️️️😐️️️️️️😐️️️️️️
