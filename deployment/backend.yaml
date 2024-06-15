@@ -33,9 +33,6 @@ spec:
           image: ideavn/golang-vite-blog-backend:{latest}
           ports:
             - containerPort: 4000
-          envFrom:
-            - configMapRef:
-                name: golang-vite-blog-backend-env
           resources:
             limits:
               cpu: 80m
