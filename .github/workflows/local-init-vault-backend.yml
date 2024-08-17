@@ -1,0 +1,129 @@
+name: Init Vault
+
+on:
+  push:
+    branches:
+      - local-init-vault-backend
+  workflow_dispatch:
+
+jobs:
+  send-notification-started:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Telegram Notification
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_GROUP_DEPLOYMENTS }}
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          format: markdown
+          disable_web_page_preview: true
+          message: |
+            *🚀 Golang Vite Blog - Init Vault*  🏃‍♂️${{ github.run_number }}
+
+            *👤 Committer:* [${{ github.actor }}](https://github.com/${{ github.actor }})
+            *📝 Commit message:* ${{ github.event.commits[0].message }}
+            *📦 Repository:* ${{ github.repository }}
+            *🔍 See changes:* [View changes](https://github.com/${{ github.repository }}/commit/${{github.sha}})
+
+            Started 🚁️️️️️️🚁️️️️️️🚁️️️️️️🚁️️️️️️
+
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up kubectl
+        uses: azure/k8s-set-context@v1
+        with:
+          kubeconfig: ${{ secrets.KUBE_CONFIG_K8S_LOCAL }}
+
+      - name: Apply Kubernetes deployment
+        env:
+          K8S_ID: ${{ secrets.K8S_ID }}
+          MONGODB_HOST: ${{ secrets.MONGODB_HOST }}
+          MONGODB_PORT: ${{ secrets.MONGODB_PORT }}
+          MONGODB_NAME: ${{ secrets.MONGODB_NAME }}
+          MONGODB_COLLECTION: ${{ secrets.MONGODB_COLLECTION }}
+          MONGODB_USERNAME: ${{ secrets.MONGODB_USERNAME }}
+          MONGODB_PASSWORD: ${{ secrets.MONGODB_PASSWORD }}
+          KAFKA_BROKERS: ${{ secrets.KAFKA_BROKERS }}
+          POSTGRES_DB_HOST: ${{ secrets.POSTGRES_DB_HOST }}
+          POSTGRES_DB_PORT: ${{ secrets.POSTGRES_DB_PORT }}
+          POSTGRES_DB_DATABASE: ${{ secrets.POSTGRES_DB_DATABASE }}
+          POSTGRES_DB_USER_NAME: ${{ secrets.POSTGRES_DB_USER_NAME }}
+          POSTGRES_DB_PASSWORD: ${{ secrets.POSTGRES_DB_PASSWORD }}
+        run: |
+          doctl kubernetes cluster kubeconfig save ${K8S_ID}
+          kubectl exec -n vault -i vault-0 -- vault kv put \
+            kv/golang-vite-blog-dev \
+            MONGODB_HOST="${MONGODB_HOST}" \
+            MONGODB_PORT="${MONGODB_PORT}" \
+            MONGODB_NAME="${MONGODB_NAME}" \
+            MONGODB_COLLECTION="${MONGODB_COLLECTION}" \
+            MONGODB_USERNAME="${MONGODB_USERNAME}" \
+            MONGODB_PASSWORD="${MONGODB_PASSWORD}" \
+            KAFKA_BROKERS="${KAFKA_BROKERS}" \
+            POSTGRES_DB_HOST="${POSTGRES_DB_HOST}" \
+            POSTGRES_DB_PORT="${POSTGRES_DB_PORT}" \
+            POSTGRES_DB_DATABASE="${POSTGRES_DB_DATABASE}" \
+            POSTGRES_DB_USER_NAME="${POSTGRES_DB_USER_NAME}" \
+            POSTGRES_DB_PASSWORD="${POSTGRES_DB_PASSWORD}"
+
+          kubectl exec -n vault -i vault-0 -- vault policy write golang-vite-blog-svc-policy - <<EOH
+          path "kv/data/golang-vite-blog-dev" {
+            capabilities = ["read"]
+          }
+          EOH
+
+          kubectl exec -n vault -i vault-0 -- vault write auth/kubernetes/role/golang-vite-blog-dev \
+            bound_service_account_names=golang-vite-blog-dev-auth \
+            bound_service_account_namespaces=golang-vite-blog \
+            policies=golang-vite-blog-svc-policy \
+            ttl=72h
+
+  send-notification-deploy-failed:
+    needs: deploy
+    runs-on: ubuntu-latest
+    if: ${{ failure() && needs.deploy.result == 'failure' }}
+    steps:
+      - name: Send Telegram Notification
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_GROUP_DEPLOYMENTS }}
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          format: markdown
+          disable_web_page_preview: true
+          message: |
+            *❌ Golang Vite Blog - Init Vault *  🏃‍♂️${{ github.run_number }}
+            
+            *👤 Committer:* [${{ github.actor }}](https://github.com/${{ github.actor }})
+            *📝 Commit message:* ${{ github.event.commits[0].message }}
+            *📦 Repository:* ${{ github.repository }}
+            *🔍 See changes:* [View changes](https://github.com/${{ github.repository }}/commit/${{github.sha}})
+
+            Deploy Failed!!!
+            😐️️️️️️😐️️️️️️😐️️️️️️😐️️️️️️😐️️️️️️😐️️️️️️
+
+  send-notification-successful:
+    needs: deploy
+    runs-on: ubuntu-latest
+    if: ${{ success() && needs.deploy.result == 'success' }}
+    steps:
+      - name: Send Telegram Notification
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_GROUP_DEPLOYMENTS }}
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          format: markdown
+          disable_web_page_preview: true
+          message: |
+            *🎉 Golang Vite Blog - Init Vault *  🏃‍♂️${{ github.run_number }}
+            
+            *👤 Committer:* [${{ github.actor }}](https://github.com/${{ github.actor }})
+            *📝 Commit message:* ${{ github.event.commits[0].message }}
+            *📦 Repository:* ${{ github.repository }}
+            *🔍 See changes:* [View changes](https://github.com/${{ github.repository }}/commit/${{github.sha}})
+
+            Successful
+            🚀️️️️️️🚀️️️️️️🚀️️️️️️🚀️️️️️️🚀️️️️️️🚀️️️️️️
