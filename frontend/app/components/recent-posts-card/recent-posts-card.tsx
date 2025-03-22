@@ -1,4 +1,4 @@
-import { Paper, Text } from "@mantine/core";
+import { Pagination, Paper, Text } from "@mantine/core";
 import { useEffect, useState } from "react";
 import { RecentPost } from "../recent-post/recent-post";
 import { Tag } from "../tag/tag";
@@ -8,16 +8,21 @@ import { useNavigate } from "@remix-run/react";
 export function RecentPostsCard() {
   const [data, setData] = useState(null);
   const [selectedTag, setSelectedTag] = useState<string>("All");
+  const [selectedPage, setSelectedPage] = useState<number>(1);
+  const [totalPage, setTotalPage] = useState<number>(1);
   const navigate = useNavigate();
 
   useEffect(() => {
     fetch(
       `${
         import.meta.env.VITE_API_URL
-      }/api/recent-posts?tag=${selectedTag?.toLowerCase()}`
+      }/api/recent-posts?tag=${selectedTag?.toLowerCase()}&skip=${
+        (selectedPage - 1) * 8
+      }&limit=8`
     )
       .then((response) => response.json())
       .then((data) => {
+        setTotalPage(Math.ceil(data?.total / 8));
         const recentPosts = data?.content
           ?.filter(
             (item: {
@@ -37,14 +42,22 @@ export function RecentPostsCard() {
               return true;
             }
           )
-          ?.map((post: { id: string; title: string; banner_image: string }) => (
-            <RecentPost
-              key={post.id}
-              title={post.title}
-              bannerImage={post.banner_image}
-              onClick={() => handlePostClick(post.id)}
-            />
-          ));
+          ?.map(
+            (post: {
+              id: string;
+              title: string;
+              banner_image: string;
+              params: { tags: string[] };
+            }) => (
+              <RecentPost
+                key={post.id}
+                title={post.title}
+                bannerImage={post.banner_image}
+                tags={post?.params?.tags}
+                onClick={() => handlePostClick(post.id)}
+              />
+            )
+          );
 
         setData(recentPosts);
       })
@@ -52,7 +65,7 @@ export function RecentPostsCard() {
         console.error("Error fetching data:", error);
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedTag]);
+  }, [selectedTag, selectedPage]);
 
   const handlePostClick = (id: string) => {
     navigate(`/content/${id}`);
@@ -60,6 +73,12 @@ export function RecentPostsCard() {
 
   const selectPost = (tag: string) => {
     setSelectedTag(tag);
+    setSelectedPage(1);
+  };
+
+  const handlePageChange = (page: number) => {
+    setSelectedPage(page);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (
@@ -88,6 +107,16 @@ export function RecentPostsCard() {
       </div>
 
       {data}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          alignItems: "center",
+          marginTop: "1rem",
+        }}
+      >
+        <Pagination total={totalPage} onChange={handlePageChange} />
+      </div>
     </Paper>
   );
 }

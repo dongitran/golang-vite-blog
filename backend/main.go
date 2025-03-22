@@ -41,8 +41,23 @@ func main() {
 
 	router.GET("/api/recent-posts", func(c *gin.Context) {
 		tag := c.Query("tag")
+		skip := c.DefaultQuery("skip", "0")
+		limit := c.DefaultQuery("limit", "10")
+
+		skipInt, err := strconv.Atoi(skip)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid skip parameter"})
+			return
+		}
+
+		limitInt, err := strconv.Atoi(limit)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid limit parameter"})
+			return
+		}
+
 		repository := repositories.NewContentRepository(db)
-		datas, _ := repository.GetLimitedSortedRecords(5, tag)
+		datas, total, _ := repository.GetLimitedSortedRecords(limitInt, skipInt, tag)
 
 		var contentData []gin.H
 		for _, v := range datas {
@@ -53,7 +68,7 @@ func main() {
 				"params":       v.Params,
 			})
 		}
-		c.JSON(http.StatusOK, gin.H{"content": contentData})
+		c.JSON(http.StatusOK, gin.H{"content": contentData, "total": total})
 	})
 
 	router.GET("/api/post/:id", func(c *gin.Context) {
@@ -73,7 +88,7 @@ func main() {
 	router.GET("/api/trending-posts", func(c *gin.Context) {
 		tag := "trending"
 		repository := repositories.NewContentRepository(db)
-		datas, _ := repository.GetLimitedSortedRecords(5, tag)
+		datas, _, _ := repository.GetLimitedSortedRecords(5, 0, tag)
 
 		var contentData []gin.H
 		for _, v := range datas {
