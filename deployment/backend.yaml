@@ -7,7 +7,7 @@ metadata:
     app: golang-vite-blog-backend
 spec:
   serviceName: golang-vite-blog-backend
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: golang-vite-blog-backend
@@ -35,8 +35,8 @@ spec:
             - containerPort: 4000
           resources:
             limits:
-              cpu: 80m
-              memory: 128Mi
+              cpu: 1000m
+              memory: 1000Mi
             requests:
               cpu: 50m
               memory: 64Mi
@@ -50,12 +50,11 @@ metadata:
 spec:
   selector:
     app: golang-vite-blog-backend
-  type: NodePort
+  type: ClusterIP
   ports:
     - protocol: TCP
       port: 4000
       targetPort: 4000
-      nodePort: 30150
 
 ---
 apiVersion: networking.k8s.io/v1
@@ -67,7 +66,7 @@ metadata:
     kubernetes.io/ingress.class: nginx
 spec:
   rules:
-  - host: dongtran-backend.sequential-ci.xyz
+  - host: api.dtur.xyz
     http:
       paths:
       - pathType: Prefix
