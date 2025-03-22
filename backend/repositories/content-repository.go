@@ -35,28 +35,43 @@ func (r *ContentRepository) Delete(id int) error {
 	return err
 }
 
-func (r *ContentRepository) GetLimitedSortedRecords(limit int, tag string) ([]*models.Content, error) {
+func (r *ContentRepository) GetLimitedSortedRecords(limit int, offset int, tag string) ([]*models.Content, int, error) {
 	var Contents []*models.Content
+	var total int
+	var err error
+
+	baseQuery := r.DB.Model(&Contents)
 
 	if tag == "" || tag == "all" {
-		err := r.DB.Model(&Contents).
+		total, err = baseQuery.Where("not (params->>'tags')::jsonb @> '[ \"trending\" ]'::jsonb").Count()
+		if err != nil {
+			return nil, 0, err
+		}
+
+		err = baseQuery.
 			Where("not (params->>'tags')::jsonb @> '[ \"trending\" ]'::jsonb").
 			Order("created_at DESC").
+			Offset(offset).
 			Limit(limit).
 			Select()
-		return Contents, err
-	}
+	} else {
+		total, err = baseQuery.Where("(params->>'tags')::jsonb @> '[ \"" + tag + "\" ]'::jsonb").Count()
+		if err != nil {
+			return nil, 0, err
+		}
 
-	err := r.DB.Model(&Contents).
-		Where("(params->>'tags')::jsonb @> '[ \"" + tag + "\" ]'::jsonb").
-		Order("created_at DESC").
-		Limit(limit).
-		Select()
+		err = baseQuery.
+			Where("(params->>'tags')::jsonb @> '[ \"" + tag + "\" ]'::jsonb").
+			Order("created_at DESC").
+			Offset(offset).
+			Limit(limit).
+			Select()
+	}
 
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
-	return Contents, nil
-
+	return Contents, total, nil
 }
+

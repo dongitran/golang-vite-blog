@@ -4,10 +4,12 @@ import classes from "./recent-post.module.css";
 export function RecentPost({
   title,
   bannerImage,
+  tags,
   onClick,
 }: {
   title: string;
   bannerImage: string;
+  tags: string[];
   onClick: () => void;
 }) {
   return (
@@ -21,9 +23,23 @@ export function RecentPost({
       <Group wrap="nowrap" gap={0}>
         <Image src={bannerImage} height={160} />
         <div className={classes.body}>
-          <Text tt="uppercase" c="dimmed" fw={700} size="xs">
-            BackEnd
-          </Text>
+          <div style={{ display: "flex" }}>
+            {tags?.map((item, index) => {
+              if (item.toLowerCase() !== "trending") {
+                return (
+                  <Text
+                    tt="uppercase"
+                    c="dimmed"
+                    fw={700}
+                    size="xs"
+                    key={index}
+                  >
+                    {item}
+                  </Text>
+                );
+              }
+            })}
+          </div>
           <Text className={classes.title} mt="xs" mb="md">
             {title}
           </Text>
