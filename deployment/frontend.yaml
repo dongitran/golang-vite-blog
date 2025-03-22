@@ -23,8 +23,8 @@ spec:
             - containerPort: 3000
           resources:
             limits:
-              cpu: 400m
-              memory: 256Mi
+              cpu: 1000m
+              memory: 1000Mi
             requests:
               cpu: 100m
               memory: 128Mi
@@ -55,7 +55,7 @@ metadata:
     kubernetes.io/ingress.class: nginx
 spec:
   rules:
-  - host: dongtran.sequential-ci.xyz
+  - host: dtur.xyz
     http:
       paths:
       - pathType: Prefix
